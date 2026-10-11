@@ -253,27 +253,13 @@
         <div id="calendar-day-details" class="mt-5 rounded-2xl bg-slate-50 p-4" aria-live="polite"></div>
       </section>
 
-      <div class="grid gap-6 lg:grid-cols-1">
-        <section class="rounded-3xl bg-white p-6 shadow-card sm:p-8" aria-labelledby="history-title">
-          <div class="mb-5 flex items-center justify-between gap-3">
-            <div>
-              <h2 id="history-title" class="text-xl font-extrabold tracking-tight">Tages-History</h2>
-              <p class="mt-1 text-sm text-slate-500">Deine getrunkenen Gläser im Überblick</p>
-            </div>
-          </div>
-          <ul id="history-list" class="max-h-80 space-y-3 overflow-y-auto" aria-live="polite" aria-relevant="additions removals">
-            <li id="empty-state" class="rounded-2xl border border-dashed border-slate-200 px-4 py-8 text-center">
-              <span class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-sky-50 text-water">
-                <svg aria-hidden="true" class="h-6 w-6" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 3s-6 6.8-6 11a6 6 0 0 0 12 0c0-4.2-6-11-6-11Z" stroke="currentColor" stroke-width="1.7" />
-                </svg>
-              </span>
-              <p class="font-semibold text-slate-700">Noch keine Einträge</p>
-              <p class="mt-1 text-sm text-slate-500">Dein erster Schluck erscheint hier.</p>
-            </li>
-          </ul>
-        </section>
-      </div>
+      <section class="rounded-3xl bg-white p-6 shadow-card sm:p-8" aria-labelledby="history-title">
+        <div class="mb-5">
+          <h2 id="history-title" class="text-xl font-extrabold tracking-tight">Tages-History</h2>
+          <p class="mt-1 text-sm text-slate-500">Deine getrunkenen Gläser im Überblick</p>
+        </div>
+        <ul id="history-list" class="max-h-80 space-y-3 overflow-y-auto" aria-live="polite" aria-relevant="additions removals"></ul>
+      </section>
       <footer class="py-8 text-center text-xs text-slate-400">Ein Schluck nach dem anderen. Du schaffst das!</footer>
     </main>
     <dialog id="goal-dialog" class="w-[calc(100%-2rem)] max-w-md rounded-3xl p-0 shadow-2xl backdrop:bg-slate-900/40">

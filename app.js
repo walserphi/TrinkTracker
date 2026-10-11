@@ -46,16 +46,22 @@ const importDataFile = document.querySelector("#import-data-file");
 const loadSampleDataButton = document.querySelector("#load-sample-data-button");
 
 const today = new Date();
-const dateKey = [
-  today.getFullYear(),
-  String(today.getMonth() + 1).padStart(2, "0"),
-  String(today.getDate()).padStart(2, "0"),
-].join("-");
+const dateKey = getDateKey(today);
 const storageKey = `${STORAGE_PREFIX}-${dateKey}`;
 const dateFormatter = new Intl.DateTimeFormat("de-DE", {
   weekday: "long",
   day: "numeric",
   month: "long",
+});
+const calendarDateFormatter = new Intl.DateTimeFormat("de-DE", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+const calendarMonthFormatter = new Intl.DateTimeFormat("de-DE", {
+  month: "long",
+  year: "numeric",
 });
 const timeFormatter = new Intl.DateTimeFormat("de-DE", {
   hour: "2-digit",
@@ -839,17 +845,6 @@ function renderCalendar() {
     visibleMonth.getMonth() === currentMonth.getMonth();
   const visibleMonthPrefix =
     `${visibleMonth.getFullYear()}-${String(visibleMonth.getMonth() + 1).padStart(2, "0")}`;
-  const dateLabel = new Intl.DateTimeFormat("de-DE", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-  const monthLabel = new Intl.DateTimeFormat("de-DE", {
-    month: "long",
-    year: "numeric",
-  });
-
   if (!selectedCalendarDate || !selectedCalendarDate.startsWith(visibleMonthPrefix)) {
     selectedCalendarDate =
       isCurrentMonth
@@ -860,7 +855,7 @@ function renderCalendar() {
             .pop() || getDateKey(firstOfMonth);
   }
 
-  calendarMonthLabel.textContent = monthLabel.format(visibleMonth);
+  calendarMonthLabel.textContent = calendarMonthFormatter.format(visibleMonth);
   nextMonthButton.disabled =
     visibleMonth.getFullYear() > currentMonth.getFullYear() ||
     (visibleMonth.getFullYear() === currentMonth.getFullYear() &&
@@ -901,10 +896,10 @@ function renderCalendar() {
     if (isFuture) button.classList.add("cursor-not-allowed", "opacity-40");
     button.setAttribute(
       "aria-label",
-      `${dateLabel.format(date)}: ${total.toLocaleString("de-DE")} ml${total >= dailyGoal ? ", Tagesziel erreicht" : total > 0 ? ", getrunken" : ", kein Eintrag"}`,
+      `${calendarDateFormatter.format(date)}: ${total.toLocaleString("de-DE")} ml${total >= dailyGoal ? ", Tagesziel erreicht" : total > 0 ? ", getrunken" : ", kein Eintrag"}`,
     );
     button.setAttribute("aria-pressed", String(isSelected));
-    button.title = `${dateLabel.format(date)} · ${total.toLocaleString("de-DE")} ml`;
+    button.title = `${calendarDateFormatter.format(date)} · ${total.toLocaleString("de-DE")} ml`;
 
     const dayNumber = document.createElement("span");
     dayNumber.className = "text-sm font-bold";
@@ -934,22 +929,15 @@ function renderCalendar() {
     monthTotal += dayEntries.reduce((sum, entry) => sum + entry.amount, 0);
   }
 
-  renderCalendarDayDetails(dailyHistory, selectedCalendarDate, activeDays, monthTotal, monthLabel);
-
+  renderCalendarDayDetails(dailyHistory, selectedCalendarDate, activeDays, monthTotal);
 }
 
-function renderCalendarDayDetails(dailyHistory, selectedDate, activeDays, monthTotal, monthLabel) {
+function renderCalendarDayDetails(dailyHistory, selectedDate, activeDays, monthTotal) {
   const dayEntries = dailyHistory.get(selectedDate) || [];
   const selected = new Date(`${selectedDate}T12:00:00`);
-  const dateLabel = new Intl.DateTimeFormat("de-DE", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
   const heading = document.createElement("h4");
   heading.className = "font-bold text-ink";
-  heading.textContent = dateLabel.format(selected);
+  heading.textContent = calendarDateFormatter.format(selected);
 
   const daySummary = document.createElement("p");
   daySummary.className = "mt-1 text-sm text-slate-600";
@@ -961,7 +949,7 @@ function renderCalendarDayDetails(dailyHistory, selectedDate, activeDays, monthT
 
   const monthlySummary = document.createElement("p");
   monthlySummary.className = "mt-3 border-t border-slate-200 pt-3 text-xs font-medium text-slate-500";
-  monthlySummary.textContent = `${monthLabel.format(visibleMonth)}: ${activeDays} ${activeDays === 1 ? "aktiver Tag" : "aktive Tage"} · ${monthTotal.toLocaleString("de-DE")} ml insgesamt`;
+  monthlySummary.textContent = `${calendarMonthFormatter.format(visibleMonth)}: ${activeDays} ${activeDays === 1 ? "aktiver Tag" : "aktive Tage"} · ${monthTotal.toLocaleString("de-DE")} ml insgesamt`;
 
   calendarDayDetails.replaceChildren(heading, daySummary);
   if (dayEntries.length > 0) {
