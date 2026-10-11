@@ -1,4 +1,4 @@
-const CACHE_NAME = "trinktracker-v7";
+const CACHE_NAME = "trinktracker-v9";
 const APP_SHELL = [
   "./",
   "./index.html",

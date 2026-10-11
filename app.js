@@ -686,20 +686,17 @@ function render() {
     amountsByDrink.set(entry.drinkId, (amountsByDrink.get(entry.drinkId) || 0) + entry.amount);
   });
 
-  let renderedProgress = 0;
   const goalProgress = Math.min(total, dailyGoal);
   drinks.forEach((drink) => {
     const amount = amountsByDrink.get(drink.id) || 0;
-    if (amount === 0 || renderedProgress >= goalProgress) return;
+    if (amount === 0) return;
 
-    const segmentAmount = Math.min(amount, goalProgress - renderedProgress);
     const segment = document.createElement("div");
     segment.className = "h-full shrink-0 transition-all duration-500";
     segment.style.backgroundColor = drink.color;
-    segment.style.width = `${(segmentAmount / dailyGoal) * 100}%`;
+    segment.style.width = `${(amount / total) * (goalProgress / dailyGoal) * 100}%`;
     segment.setAttribute("aria-hidden", "true");
     progressTrack.append(segment);
-    renderedProgress += segmentAmount;
   });
 
   drinkLegend.replaceChildren();
@@ -738,7 +735,7 @@ function render() {
 
   entries.forEach((entry) => {
     const item = document.createElement("li");
-    item.className = "flex items-center justify-between gap-2 rounded-2xl bg-slate-50 px-3 py-3 sm:gap-4 sm:px-4";
+    item.className = "flex flex-col items-stretch gap-2 rounded-2xl bg-slate-50 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-4";
 
     const details = document.createElement("div");
     details.className = "flex min-w-0 items-center gap-3";
@@ -763,7 +760,7 @@ function render() {
     amount.textContent = `+${entry.amount.toLocaleString("de-DE")} ml`;
 
     const actions = document.createElement("div");
-    actions.className = "flex shrink-0 items-center gap-2";
+    actions.className = "flex items-center justify-between gap-2 sm:shrink-0";
     const undoButton = document.createElement("button");
     undoButton.type = "button";
     undoButton.className = "rounded-lg px-2 py-2 text-xs font-semibold text-rose-600 transition hover:bg-rose-50 focus:outline-none focus:ring-4 focus:ring-rose-100 sm:px-3 sm:text-sm";
