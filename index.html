@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f4f8fb" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="TrinkTracker" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icons/icon.svg" />
+    <meta
+      name="description"
+      content="Behalte deine tägliche Wasserzufuhr im Blick."
+    />
+    <title>TrinkTracker – Bleib hydriert</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+            },
+            colors: {
+              ink: "#153047",
+              water: "#1687d9",
+              mist: "#f4f8fb",
+            },
+            boxShadow: {
+              card: "0 18px 50px rgba(21, 48, 71, 0.08)",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="min-h-screen bg-mist font-sans text-ink antialiased">
+    <div class="pointer-events-none fixed inset-x-0 top-0 -z-10 h-80 bg-gradient-to-br from-sky-100 via-cyan-50 to-mist"></div>
+
+    <main class="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+      <header class="mb-8 flex items-center justify-between gap-4">
+        <a href="#" class="flex items-center gap-3" aria-label="TrinkTracker Startseite">
+          <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-water text-white shadow-lg shadow-sky-200">
+            <svg aria-hidden="true" class="h-6 w-6" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2.75S5.5 10.1 5.5 14.5a6.5 6.5 0 1 0 13 0C18.5 10.1 12 2.75 12 2.75Z" stroke="currentColor" stroke-width="1.8" />
+              <path d="M9 15.5a3.1 3.1 0 0 0 3.1 3.1" stroke="currentColor" stroke-linecap="round" stroke-width="1.8" />
+            </svg>
+          </span>
+          <span>
+            <span class="block text-lg font-extrabold tracking-tight">TrinkTracker</span>
+            <span class="block text-xs font-medium text-slate-500">Dein täglicher Wasserkick</span>
+          </span>
+        </a>
+        <div class="flex items-center gap-2">
+          <span class="hidden rounded-full border border-white/80 bg-white/70 px-4 py-2 text-sm font-semibold text-slate-600 shadow-sm sm:inline-flex">
+            <span id="today-label"></span>
+          </span>
+          <div class="relative">
+            <button
+              id="menu-button"
+              type="button"
+              class="flex h-11 w-11 items-center justify-center rounded-xl border border-white/80 bg-white/80 text-slate-600 shadow-sm transition hover:bg-white focus:outline-none focus:ring-4 focus:ring-sky-100"
+              aria-label="Menü öffnen"
+              aria-haspopup="menu"
+              aria-expanded="false"
+              aria-controls="settings-menu"
+            >
+              <svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="5" cy="12" r="1.8" />
+                <circle cx="12" cy="12" r="1.8" />
+                <circle cx="19" cy="12" r="1.8" />
+              </svg>
+            </button>
+            <div id="settings-menu" class="absolute right-0 z-10 mt-2 hidden w-52 rounded-2xl border border-slate-100 bg-white p-2 shadow-card" role="menu" aria-label="Einstellungen">
+              <button id="install-app-button" type="button" role="menuitem" class="hidden w-full rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-water transition hover:bg-sky-50">
+                App installieren
+              </button>
+              <button id="export-data-button" type="button" role="menuitem" class="w-full rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-slate-700 transition hover:bg-sky-50 hover:text-water">
+                Daten exportieren
+              </button>
+              <button id="import-data-button" type="button" role="menuitem" class="w-full rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-slate-700 transition hover:bg-sky-50 hover:text-water">
+                Daten importieren
+              </button>
+              <button id="load-sample-data-button" type="button" role="menuitem" class="w-full rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-slate-700 transition hover:bg-sky-50 hover:text-water">
+                Beispieldatei laden
+              </button>
+              <button id="change-goal-button" type="button" role="menuitem" class="w-full rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-slate-700 transition hover:bg-sky-50 hover:text-water">
+                Tagesziel ändern
+              </button>
+              <button id="reset-button" type="button" role="menuitem" class="w-full rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-rose-600 transition hover:bg-rose-50">
+                Tag zurücksetzen
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+      <p id="storage-warning" class="mb-5 hidden rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800" role="alert"></p>
+      <input id="import-data-file" type="file" accept="application/json,.json" class="hidden" />
+
+      <section class="mb-6 rounded-3xl bg-white p-6 shadow-card sm:p-9" aria-labelledby="progress-title">
+        <div class="flex flex-col justify-between gap-6 sm:flex-row sm:items-start">
+          <div>
+            <p class="mb-2 text-sm font-semibold uppercase tracking-[0.16em] text-water">Dein Tagesziel</p>
+            <h1 id="progress-title" class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+              Bleib gut hydriert
+            </h1>
+            <p class="mt-2 text-slate-500">Jeder Schluck bringt dich deinem Ziel näher.</p>
+          </div>
+          <div class="rounded-2xl bg-sky-50 px-5 py-3 sm:text-right">
+            <span class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Tagesziel</span>
+            <span class="mt-1 block text-2xl font-extrabold text-ink"><span id="daily-goal">2.500</span> <span class="text-base font-semibold text-slate-500">ml</span></span>
+          </div>
+        </div>
+
+        <div class="mt-9">
+          <div class="mb-3 flex items-end justify-between gap-4">
+            <p class="text-sm font-semibold text-slate-600">
+              <span id="consumed-amount" class="text-2xl font-extrabold text-ink">0</span>
+              <span class="text-slate-500">ml getrunken</span>
+            </p>
+            <p id="progress-percent" class="text-2xl font-extrabold text-water" aria-live="polite">0%</p>
+          </div>
+          <div
+            id="progress-track"
+            class="flex h-4 overflow-hidden rounded-full bg-slate-100"
+            role="progressbar"
+            aria-label="Fortschritt des täglichen Trinkziels"
+            aria-valuemin="0"
+            aria-valuemax="2500"
+            aria-valuenow="0"
+          >
+          </div>
+          <p id="goal-message" class="mt-3 text-sm text-slate-500" aria-live="polite">Noch 2.500 ml bis zu deinem Tagesziel.</p>
+          <ul id="drink-legend" class="mt-4 flex flex-wrap gap-x-4 gap-y-2" aria-label="Getrunkene Mengen pro Getränk"></ul>
+        </div>
+      </section>
+
+      <section class="mb-6 rounded-3xl bg-white p-6 shadow-card sm:p-8" aria-labelledby="add-title">
+        <div class="mb-6">
+          <h2 id="add-title" class="text-xl font-extrabold tracking-tight">Getränk hinzufügen</h2>
+          <p class="mt-1 text-sm text-slate-500">Wähle ein Getränk und trage deine Trinkmenge ein.</p>
+        </div>
+
+        <div class="mb-5 flex items-end gap-3">
+          <div class="min-w-0 flex-1">
+            <label for="drink-select" class="mb-2 block text-sm font-semibold text-slate-700">Getränk</label>
+            <select id="drink-select" class="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-ink outline-none transition focus:border-water focus:ring-4 focus:ring-sky-100"></select>
+          </div>
+          <button id="add-drink-button" type="button" class="h-12 shrink-0 rounded-xl border border-slate-200 px-4 text-sm font-bold text-water transition hover:border-sky-300 hover:bg-sky-50 focus:outline-none focus:ring-4 focus:ring-sky-100">
+            + Getränk
+          </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <button type="button" data-amount="250" class="group rounded-2xl border border-slate-200 p-4 text-left transition hover:border-sky-300 hover:bg-sky-50 focus:outline-none focus:ring-4 focus:ring-sky-100">
+            <span class="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-water transition group-hover:bg-white">
+              <svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                <path d="M7 5h10l-.8 15H7.8L7 5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+                <path d="M8 10h8" stroke="currentColor" stroke-width="1.7" />
+              </svg>
+            </span>
+            <span class="block text-lg font-extrabold">+250</span>
+            <span class="text-xs font-medium text-slate-500">Glas · ml</span>
+          </button>
+          <button type="button" data-amount="500" class="group rounded-2xl border border-slate-200 p-4 text-left transition hover:border-sky-300 hover:bg-sky-50 focus:outline-none focus:ring-4 focus:ring-sky-100">
+            <span class="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-water transition group-hover:bg-white">
+              <svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                <path d="M9 3h6v3l1.5 1.5V20H7.5V7.5L9 6V3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+                <path d="M8 11h8" stroke="currentColor" stroke-width="1.7" />
+              </svg>
+            </span>
+            <span class="block text-lg font-extrabold">+500</span>
+            <span class="text-xs font-medium text-slate-500">Flasche · ml</span>
+          </button>
+          <button type="button" data-amount="750" class="group rounded-2xl border border-slate-200 p-4 text-left transition hover:border-sky-300 hover:bg-sky-50 focus:outline-none focus:ring-4 focus:ring-sky-100">
+            <span class="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-water transition group-hover:bg-white">
+              <svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                <path d="M12 3v18M3 12h18" stroke="currentColor" stroke-linecap="round" stroke-width="1.8" />
+              </svg>
+            </span>
+            <span class="block text-lg font-extrabold">+750</span>
+            <span class="text-xs font-medium text-slate-500">Groß · ml</span>
+          </button>
+        </div>
+
+        <form id="custom-form" class="mt-6 border-t border-slate-100 pt-6">
+          <label for="custom-amount" class="mb-2 block text-sm font-semibold text-slate-700">Benutzerdefinierte Menge</label>
+          <div class="flex gap-3">
+            <div class="relative min-w-0 flex-1">
+              <input
+                id="custom-amount"
+                name="amount"
+                type="number"
+                min="1"
+                step="1"
+                inputmode="numeric"
+                placeholder="z. B. 300"
+                class="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 pr-12 text-ink outline-none transition placeholder:text-slate-400 focus:border-water focus:ring-4 focus:ring-sky-100"
+                required
+              />
+              <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-sm font-medium text-slate-400">ml</span>
+            </div>
+            <button type="submit" class="h-12 rounded-xl bg-water px-5 text-sm font-bold text-white shadow-md shadow-sky-200 transition hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-200">
+              Hinzufügen
+            </button>
+          </div>
+          <p id="input-error" class="mt-2 hidden text-sm font-medium text-rose-600" role="alert"></p>
+        </form>
+      </section>
+
+      <section class="mb-6 rounded-3xl bg-white p-6 shadow-card sm:p-8" aria-labelledby="history-calendar-title">
+        <div class="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          <div>
+            <h2 id="history-calendar-title" class="mt-1 text-2xl font-extrabold tracking-tight">Deine Trink-Historie</h2>
+          </div>
+        </div>
+
+        <div class="mb-5 flex items-center justify-between gap-3">
+          <button id="previous-month-button" type="button" class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition hover:bg-sky-50 hover:text-water focus:outline-none focus:ring-4 focus:ring-sky-100" aria-label="Vorheriger Monat">
+            <svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24" fill="none"><path d="m15 18-6-6 6-6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+          </button>
+          <h3 id="calendar-month-label" class="text-lg font-bold capitalize text-ink" aria-live="polite"></h3>
+          <button id="next-month-button" type="button" class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition hover:bg-sky-50 hover:text-water focus:outline-none focus:ring-4 focus:ring-sky-100" aria-label="Nächster Monat">
+            <svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24" fill="none"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-7 gap-1.5 sm:gap-2" aria-hidden="true">
+          <span class="pb-1 text-center text-xs font-semibold text-slate-400">Mo</span>
+          <span class="pb-1 text-center text-xs font-semibold text-slate-400">Di</span>
+          <span class="pb-1 text-center text-xs font-semibold text-slate-400">Mi</span>
+          <span class="pb-1 text-center text-xs font-semibold text-slate-400">Do</span>
+          <span class="pb-1 text-center text-xs font-semibold text-slate-400">Fr</span>
+          <span class="pb-1 text-center text-xs font-semibold text-slate-400">Sa</span>
+          <span class="pb-1 text-center text-xs font-semibold text-slate-400">So</span>
+        </div>
+        <div id="calendar-grid" class="mt-2 grid grid-cols-7 gap-1.5 sm:gap-2" role="group" aria-label="Trinkaktivität im ausgewählten Monat"></div>
+
+        <div class="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs font-medium text-slate-500" aria-label="Kalender-Legende">
+          <span class="flex items-center gap-2"><span class="h-3 w-3 rounded bg-sky-500"></span>Getrunken</span>
+          <span class="flex items-center gap-2"><span class="h-3 w-3 rounded bg-emerald-500"></span>Tagesziel erreicht</span>
+          <span class="flex items-center gap-2"><span class="h-3 w-3 rounded border-2 border-water bg-white"></span>Heute</span>
+        </div>
+
+        <div id="calendar-day-details" class="mt-5 rounded-2xl bg-slate-50 p-4" aria-live="polite"></div>
+      </section>
+
+      <div class="grid gap-6 lg:grid-cols-1">
+        <section class="rounded-3xl bg-white p-6 shadow-card sm:p-8" aria-labelledby="history-title">
+          <div class="mb-5 flex items-center justify-between gap-3">
+            <div>
+              <h2 id="history-title" class="text-xl font-extrabold tracking-tight">Tages-History</h2>
+              <p class="mt-1 text-sm text-slate-500">Deine getrunkenen Gläser im Überblick</p>
+            </div>
+          </div>
+          <ul id="history-list" class="max-h-80 space-y-3 overflow-y-auto" aria-live="polite" aria-relevant="additions removals">
+            <li id="empty-state" class="rounded-2xl border border-dashed border-slate-200 px-4 py-8 text-center">
+              <span class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-sky-50 text-water">
+                <svg aria-hidden="true" class="h-6 w-6" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 3s-6 6.8-6 11a6 6 0 0 0 12 0c0-4.2-6-11-6-11Z" stroke="currentColor" stroke-width="1.7" />
+                </svg>
+              </span>
+              <p class="font-semibold text-slate-700">Noch keine Einträge</p>
+              <p class="mt-1 text-sm text-slate-500">Dein erster Schluck erscheint hier.</p>
+            </li>
+          </ul>
+        </section>
+      </div>
+      <footer class="py-8 text-center text-xs text-slate-400">Ein Schluck nach dem anderen. Du schaffst das!</footer>
+    </main>
+    <dialog id="goal-dialog" class="w-[calc(100%-2rem)] max-w-md rounded-3xl p-0 shadow-2xl backdrop:bg-slate-900/40">
+      <form id="goal-form" class="p-6 sm:p-8">
+        <h2 class="text-xl font-extrabold tracking-tight text-ink">Tagesziel ändern</h2>
+        <p class="mt-2 text-sm text-slate-500">Lege fest, wie viel du täglich insgesamt trinken möchtest.</p>
+        <label for="goal-input" class="mb-2 mt-6 block text-sm font-semibold text-slate-700">Neues Tagesziel</label>
+        <div class="relative">
+          <input
+            id="goal-input"
+            name="goal"
+            type="number"
+            min="1"
+            max="1000000"
+            step="1"
+            inputmode="numeric"
+            class="h-12 w-full rounded-xl border border-slate-200 px-4 pr-12 text-ink outline-none transition focus:border-water focus:ring-4 focus:ring-sky-100"
+            required
+          />
+          <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-sm font-medium text-slate-400">ml</span>
+        </div>
+        <p id="goal-error" class="mt-2 hidden text-sm font-medium text-rose-600" role="alert"></p>
+        <div class="mt-7 flex justify-end gap-3">
+          <button id="cancel-goal-button" type="button" class="rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100">Abbrechen</button>
+          <button type="submit" class="rounded-xl bg-water px-5 py-2.5 text-sm font-bold text-white transition hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-200">Speichern</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="drink-dialog" class="w-[calc(100%-2rem)] max-w-lg rounded-3xl p-0 shadow-2xl backdrop:bg-slate-900/40">
+      <form id="drink-form" class="p-6 sm:p-8">
+        <h2 class="text-xl font-extrabold tracking-tight text-ink">Getränk hinzufügen</h2>
+        <p class="mt-2 text-sm text-slate-500">Lege einen Namen und eine eigene Farbe fest. Wasser bleibt blau.</p>
+        <label for="drink-name" class="mb-2 mt-6 block text-sm font-semibold text-slate-700">Getränkename</label>
+        <input id="drink-name" name="name" type="text" maxlength="30" autocomplete="off" class="h-12 w-full rounded-xl border border-slate-200 px-4 text-ink outline-none transition focus:border-water focus:ring-4 focus:ring-sky-100" placeholder="z. B. Tee" required />
+        <fieldset class="mt-5">
+          <legend class="text-sm font-semibold text-slate-700">Farbe auswählen <span class="font-normal text-slate-500">(30 unterscheidbare Farben)</span></legend>
+          <div id="color-palette" class="mt-3 grid grid-cols-6 gap-3 sm:grid-cols-10" role="radiogroup" aria-label="Getränkefarbe"></div>
+        </fieldset>
+        <p id="drink-error" class="mt-3 hidden text-sm font-medium text-rose-600" role="alert"></p>
+        <div class="mt-7 flex justify-end gap-3">
+          <button id="cancel-drink-button" type="button" class="rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100">Abbrechen</button>
+          <button type="submit" class="rounded-xl bg-water px-5 py-2.5 text-sm font-bold text-white transition hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-200">Getränk speichern</button>
+        </div>
+      </form>
+    </dialog>
+    <script src="app.js" defer></script>
+  </body>
+</html>

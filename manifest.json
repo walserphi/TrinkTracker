@@ -1,0 +1,32 @@
+{
+  "id": "./",
+  "name": "TrinkTracker – Bleib hydriert",
+  "short_name": "TrinkTracker",
+  "description": "Behalte deine tägliche Trinkmenge im Blick.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f4f8fb",
+  "theme_color": "#f4f8fb",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
