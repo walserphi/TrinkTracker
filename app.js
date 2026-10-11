@@ -4,12 +4,16 @@ const GOAL_STORAGE_KEY = `${STORAGE_PREFIX}-daily-goal`;
 const DRINKS_STORAGE_KEY = `${STORAGE_PREFIX}-drinks`;
 const WATER_DRINK = { id: "water", name: "Wasser", color: "#1687D9" };
 const DRINK_COLORS = [
-  "#E4572E", "#F28E2B", "#D6A700", "#8C6D1F", "#6B8E23",
-  "#2E8B57", "#00A878", "#00A6A6", "#3A86FF", "#5E60CE",
-  "#8338EC", "#C23B8E", "#D1495B", "#7F5539", "#6C757D",
-  "#FF6B6B", "#FF9F1C", "#A7B61A", "#4C956C", "#2A9D8F",
-  "#00B4D8", "#4361EE", "#7209B7", "#B5179E", "#F72585",
-  "#BC6C25", "#606C38", "#277DA1", "#577590", "#9C6644",
+  "#E4572E", "#D6A700", "#2E8B57", "#00A6A6",
+  "#8338EC", "#C23B8E", "#7F5539", "#6C757D",
+];
+const LEGACY_DRINK_COLORS = [
+  ...DRINK_COLORS,
+  "#F28E2B", "#8C6D1F", "#6B8E23", "#00A878", "#5E60CE",
+  "#3A86FF", "#D1495B", "#FF6B6B", "#FF9F1C", "#A7B61A",
+  "#4C956C", "#2A9D8F", "#00B4D8", "#4361EE", "#7209B7",
+  "#B5179E", "#F72585", "#BC6C25", "#606C38", "#277DA1",
+  "#577590", "#9C6644",
 ];
 
 const consumedAmount = document.querySelector("#consumed-amount");
@@ -247,7 +251,11 @@ drinkForm.addEventListener("submit", (event) => {
     drinkName.focus();
     return;
   }
-  if (!selectedColor || !DRINK_COLORS.includes(selectedColor) || drinks.some((drink) => drink.color === selectedColor)) {
+  if (
+    !selectedColor ||
+    !DRINK_COLORS.includes(selectedColor.toUpperCase()) ||
+    drinks.some((drink) => drink.color.toUpperCase() === selectedColor.toUpperCase())
+  ) {
     showDrinkError("Bitte wähle eine der noch verfügbaren Farben aus.");
     return;
   }
@@ -421,11 +429,11 @@ function validateBackup(data) {
     water.name !== WATER_DRINK.name ||
     water.color.toUpperCase() !== WATER_DRINK.color ||
     data.drinks.length !== otherDrinks.length + 1 ||
-    otherDrinks.length > DRINK_COLORS.length ||
+    otherDrinks.length > LEGACY_DRINK_COLORS.length ||
     new Set(data.drinks.map((drink) => drink.id)).size !== data.drinks.length ||
     new Set(data.drinks.map((drink) => drink.name.trim().toLocaleLowerCase("de-DE"))).size !== data.drinks.length ||
     new Set(otherDrinks.map((drink) => drink.color.toUpperCase())).size !== otherDrinks.length ||
-    otherDrinks.some((drink) => !DRINK_COLORS.includes(drink.color.toUpperCase()))
+    otherDrinks.some((drink) => !LEGACY_DRINK_COLORS.includes(drink.color.toUpperCase()))
   ) {
     throw new Error("Das Backup benötigt Wasser und darf höchstens 30 eindeutige Getränkefarben enthalten.");
   }
@@ -547,9 +555,9 @@ function loadDrinks() {
 
     const otherDrinks = parsed.filter((drink) => drink.id !== WATER_DRINK.id);
     if (
-      otherDrinks.length > DRINK_COLORS.length ||
+      otherDrinks.length > LEGACY_DRINK_COLORS.length ||
       new Set(otherDrinks.map((drink) => drink.color.toUpperCase())).size !== otherDrinks.length ||
-      otherDrinks.some((drink) => !DRINK_COLORS.includes(drink.color.toUpperCase()))
+      otherDrinks.some((drink) => !LEGACY_DRINK_COLORS.includes(drink.color.toUpperCase()))
     ) {
       showStorageWarning("Die gespeicherten Getränkefarben sind ungültig. Es wird vorerst nur Wasser angezeigt.");
       return [WATER_DRINK];
@@ -623,9 +631,11 @@ function renderDrinkOptions(selectedId = drinkSelect.value || WATER_DRINK.id) {
   drinkSelect.value = drinks.some((drink) => drink.id === selectedId) ? selectedId : WATER_DRINK.id;
 
   const addDrinkButton = document.querySelector("#add-drink-button");
-  const noColorsLeft = drinks.length - 1 >= DRINK_COLORS.length;
+  const noColorsLeft = DRINK_COLORS.every((color) =>
+    drinks.some((drink) => drink.color.toUpperCase() === color),
+  );
   addDrinkButton.disabled = noColorsLeft;
-  addDrinkButton.title = noColorsLeft ? "Alle 30 Getränkefarben sind bereits vergeben." : "";
+  addDrinkButton.title = noColorsLeft ? "Alle verfügbaren Getränkefarben sind bereits vergeben." : "";
   addDrinkButton.classList.toggle("cursor-not-allowed", noColorsLeft);
   addDrinkButton.classList.toggle("opacity-50", noColorsLeft);
 }
@@ -656,7 +666,7 @@ function renderColorPalette() {
   if (colorPalette.childElementCount === 0) {
     const message = document.createElement("p");
     message.className = "col-span-full text-sm text-slate-500";
-    message.textContent = "Alle 30 Farben sind vergeben. Du kannst keine weiteren Getränke anlegen.";
+    message.textContent = `Alle ${DRINK_COLORS.length} Farben sind vergeben. Du kannst keine weiteren Getränke anlegen.`;
     colorPalette.append(message);
   }
 }
